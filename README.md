@@ -1,4 +1,5 @@
 # falkhash
+`
 Exotic Probably Shitty Hash
 
 WARNING: This is NOT meant to be a crypto hash. Do not use this for crypto!!!
@@ -521,5 +522,5 @@ Testing distribution - Worst bias is the  17-bit window at bit  96 - 0.132%
 Input vcode 0x00000001, Output vcode 0x00000001, Result vcode 0x00000001
 Verification value is 0x00000001 - Testing took 1697.968515 seconds
 -------------------------------------------------------------------------------
-
+`
 
