@@ -1,0 +1,7 @@
+all: clean
+	nasm -f win64 -DWIN -o falkhash_asm.obj falkhash.asm
+	cl /O2 /Wall /wd4820 /Zi /Zo falkhash.c falkhash_asm.obj
+
+clean:
+	-del *.pdb *.ilk *.exe *.obj
+
