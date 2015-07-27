@@ -24,6 +24,12 @@ Cycles per byte 0.146385
 Intel Xeon E5645
 Cycles per byte 0.178360
 
+Intel Core i7 970
+Cycles per byte 0.200625
+
+Intel Core i7 4712HQ
+Cycles per byte 0.083258 (holy crap this one is faster than hardware crc32)
+
 SMHasher output:
 
 --- Testing falkhash (falkhash)

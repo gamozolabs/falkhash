@@ -4,7 +4,8 @@ section .code
 
 ; A chunk_size of 0x50 is ideal for AMD fam 15h platforms, which is what this
 ; was optimized and designed for. If you change this value, you have to
-; manually add/remove movdqus and aesencs from the core loop.
+; manually add/remove movdqus and aesencs from the core loop. This must be
+; divisible by 16.
 %define CHUNK_SIZE 0x50
 
 ; rdi  -> data
@@ -68,9 +69,9 @@ falkhash:
 	; Fill the stack with 0xff's, this is our padding
 	push rdi
 	lea  rdi, [rsp + 8]
-	mov  eax, -1
-	mov  ecx, CHUNK_SIZE
-	rep  stosb
+	mov  rax, -1
+	mov  ecx, (CHUNK_SIZE / 8)
+	rep  stosq
 	pop  rdi
 
 	; Copy the remainder of data to the stack
