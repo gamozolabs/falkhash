@@ -2,6 +2,16 @@
 
 section .code
 
+%macro XMMPUSH 1
+	sub rsp, 16
+	movdqu [rsp], %1
+%endmacro
+
+%macro XMMPOP 1
+	movdqu %1, [rsp]
+	add rsp, 16
+%endmacro
+
 ; A chunk_size of 0x50 is ideal for AMD fam 15h platforms, which is what this
 ; was optimized and designed for. If you change this value, you have to
 ; manually add/remove movdqus and aesencs from the core loop. This must be
@@ -14,16 +24,21 @@ section .code
 ; xmm5 <- 128-bit hash
 ;
 ; All non-output GP registers are preserved, conforming to the falkos ABI.
-;
-; xmm0 through xmm5 are smashed. This is fine for windows x64, system V x64,
-; and falkos ABIs.
+; All non-output XMM registers are also preserved.
 falkhash:
 	push rax
 	push rcx
 	push rdi
 	push rsi
 	push rbp
-	sub  rsp, CHUNK_SIZE
+
+	XMMPUSH xmm0
+	XMMPUSH xmm1
+	XMMPUSH xmm2
+	XMMPUSH xmm3
+	XMMPUSH xmm4
+
+	sub rsp, CHUNK_SIZE
 
 	; Add the seed to the length
 	mov rbp, rsi
@@ -97,6 +112,13 @@ falkhash:
 	aesenc xmm5, xmm5
 
 	add rsp, CHUNK_SIZE
+
+	XMMPOP xmm4
+	XMMPOP xmm3
+	XMMPOP xmm2
+	XMMPOP xmm1
+	XMMPOP xmm0
+
 	pop rbp
 	pop rsi
 	pop rdi
@@ -110,15 +132,15 @@ falkhash:
 ; rcx <> pointer to caller allocated 128-bit hash destination
 ;
 ; All non-output GP registers are preserved, conforming to the falkos ABI.
-;
-; xmm0 through xmm5 are smashed. This is fine for windows x64, system V x64,
-; and falkos ABIs.
+; All XMM registers are preserved.
 global falkhash_test
 falkhash_test:
 	push rcx
 	push rdx
 	push rsi
 	push rdi
+
+	XMMPUSH xmm5
 
 %ifdef WIN
 	; Translate from windows to linux calling convention
@@ -131,7 +153,9 @@ falkhash_test:
 	call falkhash
 
 	; Store the hash into the hash destination
-	movdqa [rcx], xmm5
+	movdqu [rcx], xmm5
+
+	XMMPOP xmm5
 
 	pop rdi
 	pop rsi
