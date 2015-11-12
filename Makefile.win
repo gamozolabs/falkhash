@@ -1,7 +1,8 @@
+CFLAGS = /nologo /O2 /Zi /Zo /analyze /Wall /wd4710 /wd4711 /wd4820 /wd28251 /wd28252 /wd28253
+
 all: clean
-	nasm -f win64 -DWIN -o falkhash_asm.obj falkhash.asm
-	cl /O2 /Wall /wd4820 /Zi /Zo falkhash.c falkhash_asm.obj
+	@cl $(CFLAGS) falkhash.c
 
 clean:
-	-del *.pdb *.ilk *.exe *.obj
+	-@del *.pdb *.ilk *.exe *.obj *.xml 2> NUL
 

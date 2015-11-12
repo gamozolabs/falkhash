@@ -1,6 +1,5 @@
 all: clean
-	nasm -f elf64 -o falkhash_asm.o falkhash.asm
-	gcc -O2 -g -o falkhash falkhash.c falkhash_asm.o
+	gcc -O2 -maes -g -o falkhash falkhash.c
 
 clean:
 	rm -f falkhash *.o
