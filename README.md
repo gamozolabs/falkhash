@@ -2,6 +2,8 @@
 ```
 Exotic Probably Shitty Hash
 
+Licensed with the unlicense ( http://choosealicense.com/licenses/unlicense/ )
+
 WARNING: This is NOT meant to be a crypto hash. Do not use this for crypto!!!
 
 WARNING 2: I do not do crypto. I made this up by randomly testing things until
