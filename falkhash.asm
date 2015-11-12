@@ -30,24 +30,32 @@ falkhash:
 	push rcx
 	push rdi
 	push rsi
-	push rbp
 
 	XMMPUSH xmm0
 	XMMPUSH xmm1
 	XMMPUSH xmm2
 	XMMPUSH xmm3
 	XMMPUSH xmm4
+	XMMPUSH xmm6
 
 	sub rsp, CHUNK_SIZE
 
-	; Add the seed to the length
-	mov rbp, rsi
-	add rbp, rdx
+	; Clear stack memory for tail chunk
+	pxor xmm5, xmm5
+	movdqu [rsp], xmm5
+	movdqu [rsp + 0x10], xmm5
+	movdqu [rsp + 0x20], xmm5
+	movdqu [rsp + 0x30], xmm5
+	movdqu [rsp + 0x40], xmm5
 
-	; Place the length+seed for both the low and high 64-bits into xmm5,
-	; our hash output.
-	pinsrq xmm5, rbp, 0
-	pinsrq xmm5, rbp, 1
+	; Add the seed to the length
+	mov rax, rsi
+	add rax, rdx
+
+	; Place the seed to low 64bits and length+seed to high 64-bits of xmm6
+	pinsrq xmm6, rsi, 0
+	pinsrq xmm6, rax, 1
+	movdqa xmm5, xmm6
 
 .lewp:
 	; If we have less than a chunk, copy the partial chunk to the stack.
@@ -62,16 +70,21 @@ falkhash:
 	movdqu xmm3, [rdi + 0x30]
 	movdqu xmm4, [rdi + 0x40]
 
-	; Mix all pieces into xmm0
+	; Seed and mix all pieces into xmm0
+	pxor   xmm0, xmm6
+	pxor   xmm1, xmm6
+	pxor   xmm2, xmm6
+	pxor   xmm3, xmm6
+	pxor   xmm4, xmm6
 	aesenc xmm0, xmm1
 	aesenc xmm0, xmm2
 	aesenc xmm0, xmm3
 	aesenc xmm0, xmm4
 
-	; Finalize xmm0 by mixing with itself
-	aesenc xmm0, xmm0
+	; Finalize xmm0
+	aesenc xmm0, xmm6
 
-	; Mix in xmm0 to the hash
+	; Mix hash and xor xmm0 into the hash
 	aesenc xmm5, xmm0
 
 	; Go to the next chunk, fall through if we're done.
@@ -81,14 +94,6 @@ falkhash:
 	jmp short .done
 
 .pad_last_chunk:
-	; Fill the stack with 0xff's, this is our padding
-	push rdi
-	lea  rdi, [rsp + 8]
-	mov  rax, -1
-	mov  ecx, (CHUNK_SIZE / 8)
-	rep  stosq
-	pop  rdi
-
 	; Copy the remainder of data to the stack
 	mov rcx, rsi
 	mov rsi, rdi
@@ -105,21 +110,20 @@ falkhash:
 	; Finalize the hash. This is required at least once to pass
 	; Combination 0x8000000 and Combination 0x0000001. Need more than 1 to
 	; pass the Seed tests. We do 4 because they're pretty much free.
-	; Maybe we should actually use the seed better? Nah, more finalizing!
-	aesenc xmm5, xmm5
-	aesenc xmm5, xmm5
-	aesenc xmm5, xmm5
-	aesenc xmm5, xmm5
+	aesenc xmm5, xmm6
+	aesenc xmm5, xmm6
+	aesenc xmm5, xmm6
+	aesenc xmm5, xmm6
 
 	add rsp, CHUNK_SIZE
 
+	XMMPOP xmm6
 	XMMPOP xmm4
 	XMMPOP xmm3
 	XMMPOP xmm2
 	XMMPOP xmm1
 	XMMPOP xmm0
 
-	pop rbp
 	pop rsi
 	pop rdi
 	pop rcx
