@@ -54,6 +54,10 @@ MSVC 19.00.23026
 Intel Core i7 970
 Cycles per byte 0.198709
 
+MSVC 18.00.31101
+Intel Core i7 4712HQ
+Cycles per byte 0.074293
+
 SMHasher output:
 
 --- Testing falkhash (falkhash)
