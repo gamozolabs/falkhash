@@ -18,7 +18,8 @@ Intel processors. This hashing algorithm is not meant to be general purpose,
 and without the aesenc instruction it would perform poorly on other/older
 architectures.
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+- - - -
+
 Changelog
 
 falkhash v2 (hash values will change!!!):
@@ -34,7 +35,7 @@ falkhash v1 (hash values will change!!!):
 
 Initial commit
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+- - - -
 
 Performance stats for AMD and Intel:
 
@@ -57,6 +58,8 @@ Cycles per byte 0.198709
 MSVC 18.00.31101
 Intel Core i7 4712HQ
 Cycles per byte 0.074293
+
+- - - -
 
 SMHasher output:
 
